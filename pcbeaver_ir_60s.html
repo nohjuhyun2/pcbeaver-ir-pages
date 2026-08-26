@@ -77,6 +77,8 @@
       .slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
       .content { width: 100%; }
       .eyebrow { margin: 0 0 1cqb; color: var(--green); font-size: clamp(11px, 1.15cqi, 15px); font-weight: 750; letter-spacing: .12em; }
+      .bridge { margin: 0 0 .7cqb; color: var(--muted); font-size: clamp(11.5px, 1.05cqi, 14px); font-weight: 600; }
+      .bridge::before { content: "↳ "; color: var(--green); }
       h1, h2, p { margin: 0; }
       h1 { font-size: clamp(25px, 3.4cqi, 45px); line-height: 1.14; letter-spacing: -.04em; }
       h2 { font-size: clamp(20px, 2.5cqi, 33px); line-height: 1.2; letter-spacing: -.035em; }
@@ -97,7 +99,8 @@
       .process b { display: block; margin-top: .7cqb; font-size: clamp(13px, 1.25cqi, 16px); line-height: 1.2; }
       .process p { margin-top: .4cqb; color: #9eb0bf; font-size: clamp(10.5px, .95cqi, 12.5px); line-height: 1.32; }
       .claim { margin-top: 1.7cqb; padding-left: 1.6cqi; border-left: 4px solid var(--green); color: #eef4f8; font-weight: 600; font-size: clamp(18px, 2.15cqi, 27px); line-height: 1.38; letter-spacing: -.02em; }
-      .cost-card { margin-top: 1.5cqb; padding: clamp(16px, 2cqb, 26px) clamp(18px, 2.2cqi, 30px); border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(115deg, rgba(255,255,255,.07), rgba(255,255,255,.02)); }
+      .tag-line { margin-top: 1.1cqb; }
+      .cost-card { margin-top: .7cqb; padding: clamp(16px, 2cqb, 26px) clamp(18px, 2.2cqi, 30px); border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(115deg, rgba(255,255,255,.07), rgba(255,255,255,.02)); }
       .cost-row { display: grid; grid-template-columns: 1fr 4fr; gap: 1.4cqi; align-items: center; margin: .9cqb 0; }
       .cost-label { color: #c5d2dc; font-size: clamp(12px, 1.2cqi, 15px); }
       .bar { height: clamp(30px, 4cqb, 42px); border-radius: 6px; display: flex; align-items: center; padding: 0 1.4cqi; font-weight: 800; font-size: clamp(12.5px, 1.3cqi, 17px); }
@@ -108,12 +111,15 @@
       .cost-total b { font-size: clamp(27px, 3.4cqi, 43px); letter-spacing: -.05em; }
       .market-note { margin-top: 1cqb; padding: 1cqb 1.5cqi; border: 1px solid rgba(108,224,160,.35); border-radius: 10px; background: rgba(108,224,160,.06); color: #e3ebf1; font-weight: 500; font-size: clamp(13.5px, 1.35cqi, 16.5px); line-height: 1.45; }
       .market-note b { color: var(--green); }
-      .market-note.time-note { margin-top: .6cqb; border-color: rgba(108,188,255,.38); background: rgba(108,188,255,.06); }
-      .market-note.time-note b { color: var(--blue); }
+      .market-note .tag { margin-right: .5cqi; vertical-align: 1px; }
+      .market-note.anchor-note { margin-top: .6cqb; border-color: rgba(108,188,255,.38); background: rgba(108,188,255,.06); }
+      .market-note.anchor-note b { color: var(--blue); }
       .solution { margin-top: 2cqb; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
       .solution div { min-height: 10cqb; padding: 1.5cqb 1.6cqi; background: #0c1823; }
       .solution span { color: var(--green); font-weight: 800; font-size: clamp(10px, 1cqi, 12px); }
       .solution b { display: block; margin-top: .8cqb; font-size: clamp(14px, 1.45cqi, 18px); line-height: 1.25; }
+      .proof-note { margin-top: 1cqb; padding: 1cqb 1.4cqi; border-left: 3px solid var(--blue); background: rgba(108,188,255,.06); color: #cfdae4; font-size: clamp(11px, 1.1cqi, 14px); line-height: 1.45; }
+      .proof-note b { color: var(--blue); }
       .notes { display: none; position: absolute; z-index: 10; right: 40px; bottom: 72px; max-width: 45cqi; padding: 15px 18px; border: 1px solid rgba(108,224,160,.5); border-radius: 9px; background: rgba(3, 13, 20, .94); color: #d5e5ee; font-size: 13px; line-height: 1.5; }
       .notes.open { display: block; }
       .footnote { position: absolute; bottom: clamp(36px, 6cqb, 52px); left: clamp(28px, 6.5cqi, 96px); color: #748492; font-size: clamp(9.5px, .9cqi, 11px); }
@@ -155,14 +161,14 @@
               </svg>
               <p class="intro">PCB(인쇄회로기판)는 부품을 연결해 전류와 신호가 흐르게 만드는 기판으로, 모든 전자·전장 제품의 물리적 뼈대입니다.</p>
             </div>
-            <h1>이 설계, 이미<br />자동화된 시장일까요?</h1>
+            <h1>PCB 설계시장은<br /><span class="accent">어떻게 돌아갈까요?</span></h1>
             <div class="process">
               <div><span class="tag input">INPUT</span><b>회로도 · Netlist</b><p>설계자가 부품 간 연결 관계를 정의</p></div>
               <div><span class="tag people">사람 판단</span><b>부품 배치</b><p>전류·발열·EMI·공간 제약을 동시 고려</p></div>
               <div><span class="tag auto">Auto-router 보조</span><b>배선 Routing</b><p>선폭·경로 연결을 자동으로 보조</p></div>
               <div><span class="tag auto">자동 검증</span><b>DRC</b><p>정해진 설계 규칙 위반 여부 확인</p></div>
             </div>
-            <p class="claim">사양이 바뀌면(ECO) 다시 <b>부품 배치</b>부터 시작됩니다 — 한 번의 수정이 아니라 <span class="orange">설계 전체를 다시 여는 사건</span>입니다. 피치덱 가설 기준 약 30시간이 투입되는 설계가, 변경 때마다 처음부터 반복됩니다.</p>
+            <p class="claim">특히 <b>레이아웃에 영향을 주는</b> 사양 변경(ECO)은 다시 부품 배치와 제약 판단을 엽니다. 한 번의 수정이 아니라 <span class="orange">설계·검토 루프를 반복시키는 사건</span>입니다. 피치덱 가설 기준 약 30시간이 투입되는 설계가, 변경 때마다 다시 열릴 수 있습니다.</p>
             <p class="footnote">30시간은 내부 피치덱 가설 · 고객 프로젝트 로그와 인터뷰로 검증 중</p>
           </div>
         </article>
@@ -170,25 +176,29 @@
         <article class="slide" data-note="(20–40초) PCB 1건의 비용 구조(ECO가 83%)와 함께, ECO가 설계자 재투입·검토·외주·승인 대기를 반복시켜 리드타임까지 늘린다는 점을 제시합니다. 120억 원은 모델의 직접 검증값이 아니라 특정 조직의 비용 밀도를 보여주는 관찰값으로만 사용합니다.">
           <div class="content">
             <p class="eyebrow">02 — THE HIDDEN COST POOL</p>
+            <p class="bridge">그 반복(ECO) 하나하나에는 비용이 붙습니다.</p>
             <h2>PCB 1건 비용의<br /><span class="orange">83%는 변경 대응</span>에서 발생합니다.</h2>
+            <div class="tag-line"><span class="tag input">아래 단가·건수는 내부 가정값 · 검증 중</span></div>
             <div class="cost-card">
               <div class="cost-row"><div class="cost-label">최초 설계<br /><b class="blue">150만 원</b></div><div class="bar initial">17%</div></div>
               <div class="cost-row"><div class="cost-label">ECO 재설계<br /><b class="orange">15회 × 50만 원</b></div><div class="bar eco">750만 원 · 83%</div></div>
               <div class="cost-total"><small>최초 설계 1회 + ECO 재설계 15회</small><b>총 900만 원</b></div>
             </div>
-            <p class="lead"><b>100개 개발 프로젝트 × 프로젝트당 100개 PCB × (150만 원 + 15회 × 50만 원)</b>을 적용하면, <b class="accent">5년 누적 900억 원</b> 규모의 자동차 전장 PCB 설계 비용풀이 됩니다.</p>
-            <p class="market-note"><b>900억 원 중 ECO 재설계 비용은 750억 원</b>입니다. 이는 SOM에 이미 포함된 보조 지표이며 별도로 더하지 않습니다. 자동차 램프 PCB 초기 공략 비용풀은 <b>90억 원 / 5년</b>입니다.</p>
-            <p class="market-note time-note"><b>시간 비용도 함께 반복됩니다.</b> ECO는 설계자 재투입뿐 아니라 재검토·외주 응답·승인 대기를 다시 열어, 설계 리드타임과 팀 CAPA를 함께 소진합니다.</p>
-            <p class="footnote">내부 비용 모델 기준값 · 접촉 조직의 연간 외주비 약 120억 원은 비용 밀도를 보여주는 관찰값이며, 위 시장 모델과 범위 일치는 별도 검증 중</p>
+            <p class="lead"><b>100개 개발 프로젝트 × 프로젝트당 100개 PCB × (150만 원 + 15회 × 50만 원)</b>을 적용하면, <b class="accent">5년 누적 900억 원</b> 규모의 자동차 전장 PCB 설계 <b>비용풀</b>이 됩니다.</p>
+            <p class="market-note"><b>900억 원 중 ECO 재설계 비용은 750억 원</b>입니다. 이는 SOM에 이미 포함된 보조 지표이며 별도로 더하지 않습니다. 자동차 램프 PCB 초기 공략 비용풀은 <b>90억 원 / 5년</b>입니다. <b>이는 PCBeaver의 확정 매출시장이 아니라, PoC로 기술 적용·유료 전환 범위를 좁혀갈 전체 비용풀입니다.</b></p>
+            <p class="market-note anchor-note"><span class="tag auto">관찰값</span><b>접촉 조직 단 한 곳의 연간 설계 외주비만도 약 120억 원</b>입니다. 이 정도 규모의 조직이 실제로 존재한다는 것이, 저희 추정의 방향이 크게 벗어나지 않았다는 근거입니다.</p>
+            <p class="footnote">PCB 단가·프로젝트/PCB 수(100×100)는 내부 가정값 · 실제 견적·프로젝트 로그·고객 인터뷰로 검증 중 · 120억 원은 위 모델과 범위 일치가 별도 검증 필요한 관찰값</p>
           </div>
         </article>
 
-        <article class="slide" data-note="(40–60초) AI가 설계자를 대체한다는 과장 대신, 반복 재설계를 줄이고 설계자를 검토·양산성 판단에 집중시키는 제품이라는 결론으로 매듭짓습니다.">
+        <article class="slide" data-note="(40–60초) AI가 설계자를 대체한다는 과장 대신, 초기 배치와 재배치 초안을 줄여 설계자를 검토·양산성 판단에 집중시키는 제품이라는 결론으로 매듭짓습니다. PoC에서는 설계자 개입시간, ECO 재배치 리드타임, 1차 검토 통과율을 검증합니다.">
           <div class="content">
             <p class="eyebrow">03 — PCBEAVER</p>
+            <p class="bridge">이 비용풀에서, PCBeaver는 이렇게 다릅니다.</p>
             <h1>설계자를 대체하지 않습니다.<br /><span class="accent">재설계를 반복시키는</span><br />구조를 바꿉니다.</h1>
             <div class="solution"><div><span>INPUT</span><b>Netlist + DXF + 고객별 규칙</b></div><div><span>PCBEAVER</span><b>제약조건 기반 자동 배치·변경 대응</b></div><div><span>OUTPUT</span><b>설계자는 반복 작업 대신 양산성 검토에 집중</b></div></div>
-            <p class="claim">“PCBeaver는 PCB 한 장을 더 빨리 그리는 도구가 아니라, 변경이 올 때마다 처음부터 반복되는 설계 비용을 줄이는 AI 설계 에이전트입니다.”</p>
+            <p class="proof-note"><b>PoC 검증 지표</b> · 설계자 개입시간 · ECO 재배치 리드타임 · 1차 검토 통과율</p>
+            <p class="claim">“PCBeaver는 설계자 대신 최종 설계를 확정하는 제품이 아닙니다. 초기 배치와 재배치 초안에서 반복되는 설계 비용을 줄이는 AI 설계 에이전트입니다.”</p>
           </div>
         </article>
       </section>
