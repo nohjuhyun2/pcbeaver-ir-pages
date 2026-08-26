@@ -3,9 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PCBeaver | 60초 IR</title>
+    <meta name="description" content="PCBeaver 온라인 자료 모음" />
+    <title>PCBeaver | 자료 모음</title>
     <style>
       :root {
+        color-scheme: dark;
         --ink: #f5f8fb;
         --muted: #9aa9b7;
         --night: #071019;
@@ -13,220 +15,63 @@
         --line: rgba(255, 255, 255, 0.14);
         --green: #6ce0a0;
         --blue: #6cbcff;
-        --orange: #ffae63;
       }
 
       * { box-sizing: border-box; }
-      html, body {
-        margin: 0;
-        height: 100%;
-        background: #02070b;
-      }
       body {
+        min-height: 100vh;
+        margin: 0;
         color: var(--ink);
-        font-family: Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      button { font: inherit; }
-
-      /* Fixed 16:9 canvas, letterboxed to fill whatever window shape without
-         distorting proportions — matches a PPTX widescreen slide 1:1. */
-      .deck {
-        container: deck / size;
-        position: relative;
-        width: min(100vw, calc(100vh * 16 / 9));
-        height: min(100vh, calc(100vw * 9 / 16));
         background:
           radial-gradient(circle at 85% 5%, rgba(43, 148, 222, .22), transparent 29%),
           radial-gradient(circle at 10% 98%, rgba(57, 179, 116, .16), transparent 31%),
           var(--night);
+        font-family: Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
-      .topbar, .footer {
-        position: absolute;
-        right: clamp(20px, 5cqi, 70px);
-        left: clamp(20px, 5cqi, 70px);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        z-index: 5;
-      }
-      .topbar { top: clamp(16px, 3cqb, 30px); }
-      .footer { bottom: clamp(14px, 2.4cqb, 24px); }
-      .brand { font-size: clamp(12px, 1.2cqi, 15px); font-weight: 800; letter-spacing: .08em; }
+
+      main { width: min(100% - 40px, 980px); margin: 0 auto; padding: 88px 0; }
+      .brand { margin: 0 0 48px; font-size: 14px; font-weight: 800; letter-spacing: .1em; }
       .brand span { color: var(--green); }
-      .counter, .source { font-size: clamp(10px, 1cqi, 12px); color: var(--muted); letter-spacing: .04em; }
-      .progress { width: min(170px, 25cqi); height: 3px; background: var(--line); border-radius: 9px; overflow: hidden; margin-left: 15px; }
-      .progress > i { display: block; height: 100%; width: 20%; background: var(--green); transition: width .45s ease; }
-      .controls { display: flex; gap: 8px; }
-      .controls button {
-        width: clamp(26px, 2.6cqi, 34px); height: clamp(26px, 2.6cqi, 34px); border-radius: 50%; border: 1px solid var(--line);
-        color: var(--ink); background: rgba(255,255,255,.04); cursor: pointer;
+      .eyebrow { margin: 0 0 14px; color: var(--green); font-size: 12px; font-weight: 750; letter-spacing: .12em; }
+      h1 { max-width: 680px; margin: 0; font-size: clamp(36px, 6vw, 62px); line-height: 1.08; letter-spacing: -.045em; }
+      .intro { max-width: 560px; margin: 20px 0 52px; color: var(--muted); font-size: 17px; line-height: 1.7; }
+      .section-title { margin: 0 0 14px; font-size: 15px; color: var(--muted); font-weight: 650; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+      .card {
+        display: flex; flex-direction: column; min-height: 225px; padding: 26px;
+        color: inherit; text-decoration: none; border: 1px solid var(--line); border-radius: 18px;
+        background: rgba(14, 27, 40, .8); transition: transform .2s ease, border-color .2s ease, background .2s ease;
       }
-      .controls button:hover { border-color: var(--green); color: var(--green); }
-      .slides { height: 100%; }
-      .slide {
-        position: absolute; inset: 0;
-        padding: clamp(40px, 8cqb, 72px) clamp(28px, 6.5cqi, 96px) clamp(36px, 7.5cqb, 64px);
-        display: grid; align-items: center;
-        opacity: 0; transform: translateX(32px); pointer-events: none;
-        transition: opacity .45s ease, transform .45s ease;
-      }
-      .slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
-      .content { width: 100%; }
-      .eyebrow { margin: 0 0 1cqb; color: var(--green); font-size: clamp(11px, 1.15cqi, 15px); font-weight: 750; letter-spacing: .12em; }
-      h1, h2, p { margin: 0; }
-      h1 { font-size: clamp(25px, 3.4cqi, 45px); line-height: 1.14; letter-spacing: -.04em; }
-      h2 { font-size: clamp(20px, 2.5cqi, 33px); line-height: 1.2; letter-spacing: -.035em; }
-      .intro-row { display: flex; align-items: center; gap: 1.6cqi; margin: 0 0 1.1cqb; }
-      .pcb-icon { flex: none; width: clamp(44px, 5.2cqi, 66px); height: auto; }
-      .intro { max-width: 58cqi; margin: 0; color: #aebcc8; font-size: clamp(13px, 1.1cqi, 16px); line-height: 1.48; }
-      .lead { max-width: 84cqi; margin-top: 1.5cqb; color: #e3ebf1; font-weight: 500; font-size: clamp(15px, 1.6cqi, 21px); line-height: 1.48; letter-spacing: -.015em; }
-      .accent { color: var(--green); }
-      .blue { color: var(--blue); }
-      .orange { color: var(--orange); }
-      .process { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 1.6cqb; border: 1px solid var(--line); background: var(--line); }
-      .process > div { position: relative; min-height: 10cqb; padding: 1.3cqb 1.4cqi; background: #0b1722; }
-      .process > div:not(:last-child)::after { content: "→"; position: absolute; top: 50%; right: -10px; z-index: 2; transform: translateY(-50%); color: var(--muted); font-size: clamp(13px, 1.4cqi, 18px); }
-      .tag { display: inline-block; font-size: clamp(9px, .85cqi, 11px); font-weight: 800; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; }
-      .tag.people { color: var(--orange); background: rgba(255,174,99,.14); }
-      .tag.auto { color: var(--blue); background: rgba(108,188,255,.14); }
-      .tag.input { color: var(--muted); background: rgba(255,255,255,.07); }
-      .process b { display: block; margin-top: .7cqb; font-size: clamp(13px, 1.25cqi, 16px); line-height: 1.2; }
-      .process p { margin-top: .4cqb; color: #9eb0bf; font-size: clamp(10.5px, .95cqi, 12.5px); line-height: 1.32; }
-      .claim { margin-top: 1.7cqb; padding-left: 1.6cqi; border-left: 4px solid var(--green); color: #eef4f8; font-weight: 600; font-size: clamp(18px, 2.15cqi, 27px); line-height: 1.38; letter-spacing: -.02em; }
-      .cost-card { margin-top: 1.5cqb; padding: clamp(16px, 2cqb, 26px) clamp(18px, 2.2cqi, 30px); border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(115deg, rgba(255,255,255,.07), rgba(255,255,255,.02)); }
-      .cost-row { display: grid; grid-template-columns: 1fr 4fr; gap: 1.4cqi; align-items: center; margin: .9cqb 0; }
-      .cost-label { color: #c5d2dc; font-size: clamp(12px, 1.2cqi, 15px); }
-      .bar { height: clamp(30px, 4cqb, 42px); border-radius: 6px; display: flex; align-items: center; padding: 0 1.4cqi; font-weight: 800; font-size: clamp(12.5px, 1.3cqi, 17px); }
-      .initial { width: 17%; min-width: 100px; background: linear-gradient(90deg, #477bff, #6cbcff); }
-      .eco { width: 83%; background: linear-gradient(90deg, #df794a, #ffae63); }
-      .cost-total { display: flex; justify-content: space-between; align-items: end; padding-top: 1cqb; margin-top: 1.1cqb; border-top: 1px solid var(--line); }
-      .cost-total small { color: var(--muted); font-size: clamp(10px, 1cqi, 12px); }
-      .cost-total b { font-size: clamp(27px, 3.4cqi, 43px); letter-spacing: -.05em; }
-      .market-note { margin-top: 1cqb; padding: 1cqb 1.5cqi; border: 1px solid rgba(108,224,160,.35); border-radius: 10px; background: rgba(108,224,160,.06); color: #e3ebf1; font-weight: 500; font-size: clamp(13.5px, 1.35cqi, 16.5px); line-height: 1.45; }
-      .market-note b { color: var(--green); }
-      .market-note.time-note { margin-top: .6cqb; border-color: rgba(108,188,255,.38); background: rgba(108,188,255,.06); }
-      .market-note.time-note b { color: var(--blue); }
-      .solution { margin-top: 2cqb; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
-      .solution div { min-height: 10cqb; padding: 1.5cqb 1.6cqi; background: #0c1823; }
-      .solution span { color: var(--green); font-weight: 800; font-size: clamp(10px, 1cqi, 12px); }
-      .solution b { display: block; margin-top: .8cqb; font-size: clamp(14px, 1.45cqi, 18px); line-height: 1.25; }
-      .notes { display: none; position: absolute; z-index: 10; right: 40px; bottom: 72px; max-width: 45cqi; padding: 15px 18px; border: 1px solid rgba(108,224,160,.5); border-radius: 9px; background: rgba(3, 13, 20, .94); color: #d5e5ee; font-size: 13px; line-height: 1.5; }
-      .notes.open { display: block; }
-      .footnote { position: absolute; bottom: clamp(36px, 6cqb, 52px); left: clamp(28px, 6.5cqi, 96px); color: #748492; font-size: clamp(9.5px, .9cqi, 11px); }
-      @container deck (max-width: 620px) {
-        .process { grid-template-columns: 1fr; }
-        .process > div::after { display: none; }
-        .cost-row { grid-template-columns: 1fr; gap: 6px; margin: 9px 0; }
-        .solution { grid-template-columns: 1fr; }
-        .solution div { min-height: 74px; }
-      }
+      .card:hover, .card:focus-visible { transform: translateY(-4px); border-color: var(--green); background: rgba(18, 40, 57, .95); outline: none; }
+      .tag { width: fit-content; padding: 5px 9px; border-radius: 999px; background: rgba(108, 224, 160, .12); color: var(--green); font-size: 12px; font-weight: 700; }
+      h2 { margin: 28px 0 10px; font-size: 25px; letter-spacing: -.03em; }
+      .card p { margin: 0; color: var(--muted); line-height: 1.6; }
+      .open { margin-top: auto; padding-top: 28px; color: var(--blue); font-size: 14px; font-weight: 750; }
+      footer { margin-top: 64px; color: var(--muted); font-size: 13px; }
+      code { color: var(--ink); }
+      @media (max-width: 600px) { main { width: min(100% - 32px, 980px); padding: 48px 0; } .brand { margin-bottom: 36px; } }
     </style>
   </head>
   <body>
-    <main class="deck" aria-label="PCBeaver 60초 IR 발표">
-      <header class="topbar">
-        <div class="brand">PCB<span>EAVER</span></div>
-        <div style="display:flex; align-items:center"><span class="counter">01 / 03</span><div class="progress"><i></i></div></div>
-      </header>
+    <main>
+      <p class="brand">PC<span>BEAVER</span></p>
+      <p class="eyebrow">ONLINE MATERIALS</p>
+      <h1>PCBeaver 자료 모음</h1>
+      <p class="intro">공유 가능한 발표 자료와 문서를 한곳에서 확인하세요. 각 카드를 선택하면 해당 HTML 페이지가 열립니다.</p>
 
-      <section class="slides">
-        <article class="slide active" data-note="(0–20초) PCB가 무엇인지와 설계 프로세스(Netlist→배치→배선→DRC)를 먼저 다이어그램으로 보여준 뒤, 그중 배치와 ECO만 여전히 사람이 판단한다는 점을 보여줍니다. 30시간은 피치덱 가설이므로 검증 중이라고 말합니다.">
-          <div class="content">
-            <p class="eyebrow">01 — HOW A PCB IS ACTUALLY DESIGNED</p>
-            <div class="intro-row">
-              <svg class="pcb-icon" viewBox="0 0 84 84" aria-hidden="true">
-                <rect x="4" y="4" width="76" height="76" rx="10" fill="#0e2a20" stroke="var(--line)" />
-                <path d="M14 20 H40 V34 H58" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" opacity="0.85" />
-                <path d="M14 46 H28 V64 H50 V54 H70" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" opacity="0.6" />
-                <path d="M60 16 V30 H70" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" opacity="0.8" />
-                <circle cx="40" cy="34" r="2.2" fill="var(--green)" />
-                <circle cx="58" cy="34" r="2.2" fill="var(--green)" />
-                <circle cx="28" cy="64" r="2.2" fill="var(--green)" />
-                <rect x="42" y="42" width="18" height="18" rx="2" fill="#132536" stroke="var(--blue)" stroke-width="1.3" />
-                <rect x="16" y="16" width="10" height="10" rx="1.5" fill="#132536" stroke="var(--orange)" stroke-width="1.2" />
-                <rect x="10" y="70" width="6" height="4" fill="#d8b46a" />
-                <rect x="20" y="70" width="6" height="4" fill="#d8b46a" />
-                <rect x="30" y="70" width="6" height="4" fill="#d8b46a" />
-                <rect x="40" y="70" width="6" height="4" fill="#d8b46a" />
-              </svg>
-              <p class="intro">PCB(인쇄회로기판)는 부품을 연결해 전류와 신호가 흐르게 만드는 기판으로, 모든 전자·전장 제품의 물리적 뼈대입니다.</p>
-            </div>
-            <h1>이 설계, 이미<br />자동화된 시장일까요?</h1>
-            <div class="process">
-              <div><span class="tag input">INPUT</span><b>회로도 · Netlist</b><p>설계자가 부품 간 연결 관계를 정의</p></div>
-              <div><span class="tag people">사람 판단</span><b>부품 배치</b><p>전류·발열·EMI·공간 제약을 동시 고려</p></div>
-              <div><span class="tag auto">Auto-router 보조</span><b>배선 Routing</b><p>선폭·경로 연결을 자동으로 보조</p></div>
-              <div><span class="tag auto">자동 검증</span><b>DRC</b><p>정해진 설계 규칙 위반 여부 확인</p></div>
-            </div>
-            <p class="claim">사양이 바뀌면(ECO) 다시 <b>부품 배치</b>부터 시작됩니다 — 한 번의 수정이 아니라 <span class="orange">설계 전체를 다시 여는 사건</span>입니다. 피치덱 가설 기준 약 30시간이 투입되는 설계가, 변경 때마다 처음부터 반복됩니다.</p>
-            <p class="footnote">30시간은 내부 피치덱 가설 · 고객 프로젝트 로그와 인터뷰로 검증 중</p>
-          </div>
-        </article>
-
-        <article class="slide" data-note="(20–40초) PCB 1건의 비용 구조(ECO가 83%)와 함께, ECO가 설계자 재투입·검토·외주·승인 대기를 반복시켜 리드타임까지 늘린다는 점을 제시합니다. 120억 원은 모델의 직접 검증값이 아니라 특정 조직의 비용 밀도를 보여주는 관찰값으로만 사용합니다.">
-          <div class="content">
-            <p class="eyebrow">02 — THE HIDDEN COST POOL</p>
-            <h2>PCB 1건 비용의<br /><span class="orange">83%는 변경 대응</span>에서 발생합니다.</h2>
-            <div class="cost-card">
-              <div class="cost-row"><div class="cost-label">최초 설계<br /><b class="blue">150만 원</b></div><div class="bar initial">17%</div></div>
-              <div class="cost-row"><div class="cost-label">ECO 재설계<br /><b class="orange">15회 × 50만 원</b></div><div class="bar eco">750만 원 · 83%</div></div>
-              <div class="cost-total"><small>최초 설계 1회 + ECO 재설계 15회</small><b>총 900만 원</b></div>
-            </div>
-            <p class="lead"><b>100개 개발 프로젝트 × 프로젝트당 100개 PCB × (150만 원 + 15회 × 50만 원)</b>을 적용하면, <b class="accent">5년 누적 900억 원</b> 규모의 자동차 전장 PCB 설계 비용풀이 됩니다.</p>
-            <p class="market-note"><b>900억 원 중 ECO 재설계 비용은 750억 원</b>입니다. 이는 SOM에 이미 포함된 보조 지표이며 별도로 더하지 않습니다. 자동차 램프 PCB 초기 공략 비용풀은 <b>90억 원 / 5년</b>입니다.</p>
-            <p class="market-note time-note"><b>시간 비용도 함께 반복됩니다.</b> ECO는 설계자 재투입뿐 아니라 재검토·외주 응답·승인 대기를 다시 열어, 설계 리드타임과 팀 CAPA를 함께 소진합니다.</p>
-            <p class="footnote">내부 비용 모델 기준값 · 접촉 조직의 연간 외주비 약 120억 원은 비용 밀도를 보여주는 관찰값이며, 위 시장 모델과 범위 일치는 별도 검증 중</p>
-          </div>
-        </article>
-
-        <article class="slide" data-note="(40–60초) AI가 설계자를 대체한다는 과장 대신, 반복 재설계를 줄이고 설계자를 검토·양산성 판단에 집중시키는 제품이라는 결론으로 매듭짓습니다.">
-          <div class="content">
-            <p class="eyebrow">03 — PCBEAVER</p>
-            <h1>설계자를 대체하지 않습니다.<br /><span class="accent">재설계를 반복시키는</span><br />구조를 바꿉니다.</h1>
-            <div class="solution"><div><span>INPUT</span><b>Netlist + DXF + 고객별 규칙</b></div><div><span>PCBEAVER</span><b>제약조건 기반 자동 배치·변경 대응</b></div><div><span>OUTPUT</span><b>설계자는 반복 작업 대신 양산성 검토에 집중</b></div></div>
-            <p class="claim">“PCBeaver는 PCB 한 장을 더 빨리 그리는 도구가 아니라, 변경이 올 때마다 처음부터 반복되는 설계 비용을 줄이는 AI 설계 에이전트입니다.”</p>
-          </div>
-        </article>
+      <section aria-labelledby="materials-title">
+        <h2 class="section-title" id="materials-title">현재 자료</h2>
+        <div class="grid">
+          <a class="card" href="./pcbeaver_ir_60s.html">
+            <span class="tag">IR</span>
+            <h2>60초 IR</h2>
+            <p>PCBeaver의 핵심 가치와 사업 내용을 60초 안에 소개하는 인터랙티브 발표 자료입니다.</p>
+            <span class="open">자료 열기 →</span>
+          </a>
+        </div>
       </section>
 
-      <div class="footer"><div class="source">← → 또는 클릭으로 이동 · Space: 자동재생 · N: 발표 노트</div><div class="controls"><button type="button" aria-label="이전 슬라이드" data-action="prev">←</button><button type="button" aria-label="다음 슬라이드" data-action="next">→</button></div></div>
-      <aside class="notes" aria-live="polite"></aside>
+      <footer>새 자료를 추가할 때는 HTML 파일을 업로드한 뒤 이 목록에 카드 링크를 추가하세요.</footer>
     </main>
-    <script>
-      const slides = [...document.querySelectorAll('.slide')];
-      const counter = document.querySelector('.counter');
-      const progress = document.querySelector('.progress i');
-      const notes = document.querySelector('.notes');
-      let index = 0;
-      let timer = null;
-
-      function render(next) {
-        index = (next + slides.length) % slides.length;
-        slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
-        counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
-        progress.style.width = `${((index + 1) / slides.length) * 100}%`;
-        notes.textContent = slides[index].dataset.note;
-      }
-      function toggleAutoplay() {
-        if (timer) { clearInterval(timer); timer = null; return; }
-        timer = setInterval(() => render(index + 1), 20000);
-      }
-      document.querySelector('[data-action="prev"]').addEventListener('click', () => render(index - 1));
-      document.querySelector('[data-action="next"]').addEventListener('click', () => render(index + 1));
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowRight') render(index + 1);
-        if (event.key === 'ArrowLeft') render(index - 1);
-        if (event.key === ' ') { event.preventDefault(); toggleAutoplay(); }
-        if (event.key.toLowerCase() === 'n') notes.classList.toggle('open');
-      });
-      document.querySelector('.slides').addEventListener('click', (event) => {
-        if (!event.target.closest('button')) render(index + 1);
-      });
-      render(0);
-    </script>
   </body>
 </html>
